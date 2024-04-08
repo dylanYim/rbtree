@@ -15,9 +15,38 @@ rbtree *new_rbtree(void) {
   p->nil = root;
   return p;
 }
+void delete_node(node_t *curr){
+  node_t *parent = curr->parent;
+  if (parent == NULL){
+    free(curr);
+    curr = NULL;
+    return;
+  }
+  node_t *tmp;
+  if (parent->left != NULL && parent->left == curr) {
+    parent->left = NULL;
+    free(curr);
+    curr = NULL;
+  } else if (parent->right != NULL && parent->right == curr) {
+    parent->right = NULL;
+    free(curr);
+    curr = NULL;
+  }
 
+}
+void delete_rbtree_node(node_t *curr){
+  if (curr == NULL){
+    return;
+  }
+  delete_rbtree_node(curr->left);
+  delete_rbtree_node(curr->right);
+  delete_node(curr);
+}
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
+  delete_rbtree_node(t->root);
+  t->root = NULL;
+  t->nil = NULL;
   free(t);
 }
 
