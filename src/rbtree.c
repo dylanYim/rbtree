@@ -19,7 +19,6 @@ void delete_node(node_t *curr){
     curr = NULL;
     return;
   }
-  node_t *tmp;
   if (parent->left != NULL && parent->left == curr) {
     parent->left = NULL;
     free(curr);
@@ -31,17 +30,17 @@ void delete_node(node_t *curr){
   }
 
 }
-void delete_rbtree_node(node_t *curr){
-  if (curr == NULL){
+void delete_rbtree_node(node_t *curr, node_t *nil){
+  if (curr == nil){
     return;
   }
-  delete_rbtree_node(curr->left);
-  delete_rbtree_node(curr->right);
+  delete_rbtree_node(curr->left, nil);
+  delete_rbtree_node(curr->right, nil);
   delete_node(curr);
 }
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
-  delete_rbtree_node(t->root);
+  delete_rbtree_node(t->root, t->nil);
   t->root = NULL;
   t->nil = NULL;
   free(t);
