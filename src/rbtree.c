@@ -184,7 +184,24 @@ void insert_fix(rbtree *t, node_t *added){
 
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   // TODO: implement insert
-  return t->root;
+  if (t == NULL) {
+    return NULL;
+  }
+  node_t *nil = t->nil;
+  node_t *root = t->root;
+  node_t *added = init_node(nil, key);
+
+  if (root == nil) {
+    added->color = RBTREE_BLACK;
+    t->root = added;
+    return added;
+  }
+
+  insert_node(t, root, added);
+  insert_fix(t, added);
+
+  return added;
+
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
@@ -203,6 +220,9 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
     if (curr->key < key){
       curr = curr->right;
     }
+  }
+  if (curr == nil) {
+    return NULL;
   }
   return curr;
 }
