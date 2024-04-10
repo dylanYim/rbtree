@@ -12,37 +12,19 @@ rbtree *new_rbtree(void) {
 
   return p;
 }
-void delete_node(node_t *curr){
-  node_t *parent = curr->parent;
-  if (parent == NULL){
-    free(curr);
-    curr = NULL;
-    return;
-  }
-  if (parent->left != NULL && parent->left == curr) {
-    parent->left = NULL;
-    free(curr);
-    curr = NULL;
-  } else if (parent->right != NULL && parent->right == curr) {
-    parent->right = NULL;
-    free(curr);
-    curr = NULL;
-  }
 
-}
 void delete_rbtree_node(node_t *curr, node_t *nil){
   if (curr == nil){
     return;
   }
   delete_rbtree_node(curr->left, nil);
   delete_rbtree_node(curr->right, nil);
-  delete_node(curr);
+  free(curr);
 }
 void delete_rbtree(rbtree *t) {
   // TODO: reclaim the tree nodes's memory
   delete_rbtree_node(t->root, t->nil);
-  t->root = NULL;
-  t->nil = NULL;
+  free(t->nil);
   free(t);
 }
 node_t *init_node(node_t *nil, const key_t key){
