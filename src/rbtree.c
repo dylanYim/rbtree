@@ -213,7 +213,7 @@ node_t *rbtree_min(const rbtree *t) {
 node_t *rbtree_max(const rbtree *t) {
   // TODO: implement find
   node_t *curr_node = t->root;
-  while(curr_node->right != NULL){
+  while(curr_node->right != t->nil){
     curr_node = curr_node->right;
   }
   return curr_node;
