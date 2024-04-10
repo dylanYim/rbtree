@@ -219,8 +219,119 @@ node_t *rbtree_max(const rbtree *t) {
   return curr_node;
 }
 
+void erase_fix(rbtree *t, node_t *substitute){
+
+  node_t *sibling;
+
+  while(substitute != t->root && substitute->color == RBTREE_BLACK) {
+    if (substitute == substitute->parent->left) {
+      sibling = substitute->parent->right;
+      if (sibling->color == RBTREE_RED) {
+        sibling->color = RBTREE_BLACK;
+        substitute->parent->color = RBTREE_RED;
+        rotate_left(t, substitute->parent);
+        sibling = substitute->parent->right;
+      }
+      if (sibling->left->color == RBTREE_BLACK && sibling->right->color == RBTREE_BLACK){
+        sibling->color = RBTREE_RED;
+        substitute = substitute->parent;
+      } else {
+        if(sibling->right->color == RBTREE_BLACK) {
+          sibling->left->color = RBTREE_BLACK;
+          sibling->color = RBTREE_RED;
+          rotate_right(t, sibling);
+          sibling = substitute->parent->right;
+        }
+        sibling->color = substitute->parent->color;
+        substitute->parent->color = RBTREE_BLACK;
+        sibling->right->color = RBTREE_BLACK;
+        rotate_left(t, substitute->parent);
+        substitute = t->root;
+      }
+    } else {
+      sibling = substitute->parent->left;
+      if (sibling->color == RBTREE_RED) {
+        sibling->color = RBTREE_BLACK;
+        substitute->parent->color = RBTREE_RED;
+        rotate_right(t, substitute->parent);
+        sibling = substitute->parent->left;
+      }
+      if (sibling->right->color == RBTREE_BLACK && sibling->left->color == RBTREE_BLACK) {
+        sibling->color = RBTREE_RED;
+        substitute = substitute->parent;
+      } else {
+        if (sibling->left->color == RBTREE_BLACK) {
+          sibling->right->color = RBTREE_BLACK;
+          sibling->color = RBTREE_RED;
+          rotate_left(t, sibling);
+          sibling = substitute->parent->left;
+        }
+        sibling->color = substitute->parent->color;
+        substitute->parent->color = RBTREE_BLACK;
+        sibling->left->color = RBTREE_BLACK;
+        rotate_right(t, substitute->parent);
+        substitute = t->root;
+      }
+    }
+  }
+  substitute->color = RBTREE_BLACK;
+}
+
+node_t *find_successor(rbtree *t, node_t *target){
+  node_t *curr = target;
+  if (curr == t->nil) {
+    return curr;
+  }
+  while (curr->left != t->nil) {
+    curr = curr->left;
+  }
+  return curr;
+}
+
+void transplant(rbtree *t, node_t *u, node_t *v){
+  if (u->parent == t->nil) {
+    t->root = v;
+  } else if (u == u->parent->left) {
+    u->parent->left = v;
+  } else {
+    u->parent->right = v;
+  }
+  v->parent = u->parent;
+}
+
 int rbtree_erase(rbtree *t, node_t *p) {
   // TODO: implement erase
+
+  node_t *target = p;
+  node_t *child;
+  color_t target_origin_color = target->color;
+  if (p->left == t->nil) {
+    child = p->right;
+    transplant(t, p, p->right);
+  } else if (p->right == t->nil) {
+    child = p->left;
+    transplant(t, p, p->left);
+  }else {
+    target = find_successor(t, p->right);
+    target_origin_color = target->color;
+    child = target->right;
+    if (target->parent == p) {
+      child->parent = target;
+    }
+    else{
+      transplant(t, target, target->right);
+      target->right = p->right;
+      target->right->parent = target;
+    }
+    transplant(t, p, target);
+    target->left = p->left;
+    target->left->parent = target;
+    target->color = p->color;
+  }
+  if (target_origin_color == RBTREE_BLACK) {
+    erase_fix(t, child);
+  }
+  free(p);
   return 0;
 }
 
