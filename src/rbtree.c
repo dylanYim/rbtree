@@ -69,42 +69,40 @@ void insert_node(rbtree *t, node_t *curr, node_t *added){
 }
 
 void rotate_right(rbtree *t, node_t *key_node){
-  node_t *parent = key_node->parent;
   node_t *child = key_node->left;
 
   key_node->left = child->right;
   if (child->right != t->nil) {
     child->right->parent = key_node;
   }
-  child->parent = parent;
+  child->parent = key_node->parent;
 
-  if (parent == t->nil) {
+  if (key_node->parent == t->nil) {
     t->root = child;
-  } else if (parent->left == key_node) {
-    parent->left = child;
+  } else if (key_node == key_node->parent->right) {
+    key_node->parent->right = child;
   } else{
-    parent->right = child;
+    key_node->parent->left = child;
   }
   child->right = key_node;
   key_node->parent = child;
 }
 
 void rotate_left(rbtree *t, node_t *key_node) {
-  node_t *parent = key_node->parent;
   node_t *child = key_node->right;
 
   key_node->right = child->left;
   if (child->left != t->nil) {
     child->left->parent = key_node;
   }
-  child->parent = parent;
+  child->parent = key_node->parent;
 
-  if (parent == t->nil) {
+  if (key_node->parent == t->nil) {
     t->root = child;
-  } else if (parent->left == key_node) {
-    parent->left = child;
+  } else if (key_node == key_node->parent->left) {
+    key_node->parent->left = child;
   } else{
-    parent->right = child;
+    key_node->parent->right = child;
   }
   child->left = key_node;
   key_node->parent = child;
